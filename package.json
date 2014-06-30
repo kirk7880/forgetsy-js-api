@@ -1,0 +1,17 @@
+{
+  "name": "forgetsy-js-api",
+  "version": "0.0.0",
+  "description": "API implementation using forgetsy-js library",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "forgetsy-js": "git://github.com/kirk7880/forgetsy-js.git",
+    "restify": "*"
+  },
+  "devDependencies": {
+  },
+  "author": "",
+  "license": "ISC"
+}
