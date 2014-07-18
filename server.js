@@ -4,22 +4,23 @@ var fs = require('fs');
 var path = require('path');
 var forgetsy = require('forgetsy-js');
 var Delta = forgetsy.Delta;
-var time = forgetsy.time;
+var time = require(__dirname + '/lib/time');
 var cluster = require('cluster');
 var cpus = require('os').cpus().length;
 var workers = [];
 var sigint = false;
 var logger = console;
+var moment = require('moment');
 
 env.APP_PID = path.resolve(__dirname + '/master.pid');
 
 function onCreate(req, res, next) {
-  var time = req.query.time ? 
+  var _time = req.query.time ? 
     (time[req.query.time] ? 
       time[req.query.time]() : time.week()) : time.week();
   Delta.create({
     name: req.params.category
-    ,time: time
+    ,time: _time
   }, function(e, delta) {
     if (e) {
       res.send('Error creating entry!');
@@ -80,7 +81,7 @@ server.use(restify.queryParser());
 server.use(restify.gzipResponse());
 
 server.get('/create/:category', onCreate);
-server.get('/increment/:category/:bin/:by', onIncrement);
+server.get('/incr/:category/:bin/:by', onIncrement);
 server.get('/fetch/:category/:bin', onFetch);
 server.get('/fetch/:category', onFetch);
 
@@ -169,7 +170,7 @@ if (cluster.isMaster && env.DEBUG !== "1") {
       process.exit();
   });
 } else {
-  server.listen(8080, function() {
+  server.listen(3000, function() {
     console.log('%s listening at %s', server.name, server.url);
   });
 }
