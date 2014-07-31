@@ -1,3 +1,8 @@
+/**
+This is not production ready stuff!!!
+Prototyping
+*/
+
 var env = process.env;
 var restify = require('restify');
 var fs = require('fs');
@@ -15,53 +20,80 @@ var moment = require('moment');
 env.APP_PID = path.resolve(__dirname + '/master.pid');
 
 function onCreate(req, res, next) {
-  var _time = req.query.time ? 
-    (time[req.query.time] ? 
-      time[req.query.time]() : time.week()) : time.week();
-  Delta.create({
-    name: req.params.category
-    ,time: _time
-  }, function(e, delta) {
-    if (e) {
-      res.send('Error creating entry!');
-    } else {
-      res.send('Entry was created');
-    }
+  var qs = req.query;
+  var category = qs.category;
+  var keys = Object.keys(time);
+  var len = keys.length;
+  var count = 0;
 
-    next();
-  });
+  for (var i=0; i<len; i++) {
+    console.log('creating', category, time[keys[i]]);
+    Delta.create({
+      name: keys[i] + '_' + category
+      ,time: time[keys[i]]()
+    }, function(e) {
+      console.log('count', count)
+      if (++count >= len) {
+        res.send('Entry was created!');
+      }
+    });
+  }
 }
 
-function onIncrement(req, res, next) {
-  Delta.get(req.params.category, function(e, delta) {
-    if (e) {
-      return res.send('Error getting delta');
-    }
+var increment = function(category, bin, incrementBy, cb) {
+  Delta.get(category, function(e, delta) {
+    if (e) return cb(e);
 
     delta.incr({
-      bin: req.params.bin
-      ,by: req.params.by || 1
+      bin: bin
+      ,by: incrementBy
     }, function(e) {
-      if (e) {
-        res.send('Error incrementing bin: ' + req.params.bin);
-      } else {
-        res.send('Bin was successfully incremented: ' + req.params.bin);
-      }
+      console.log('incr', e);
+      if (e) return cb(e);
 
-      next();
+      return cb(null);
     });
-  });
+  })
+};
+
+function onIncrement(req, res, next) {
+  var qs = req.query;
+  var category = qs.category;
+  var bin = qs.bin;
+  var keys = Object.keys(time);
+  var len = keys.length;
+  var count = 0;
+  var incrementBy = parseInt(qs.by, 10);
+  incrementBy = (incrementBy > 0) ? incrementBy : 1;
+
+  for (var i=0; i<len; i++) {
+    var c = keys[i] + '_' + category;
+    increment(c, bin, incrementBy, function(e) {
+      if (++count >= len) {
+        res.send('Incremented bin');
+      }
+    });
+  }
 }
 
 function onFetch(req, res, next) {
-  Delta.get(req.params.category, function(e, delta) {
-    var opts = {};
-    if (req.params.bin) {
-      opts.bin = req.params.bin
-    }
+  var qs = req.query;
+  var category = qs.category;
+  var bin = qs.bin;
+  var filter;
 
-    if (req.query.date) {
-      opts.date = time[req.query.date]();
+  if (qs.filter && time[qs.filter]) {
+    filter = qs.filter;
+  } else {
+    filter = 'week';
+  }
+
+  category = filter + '_' + category;
+
+  Delta.get(category, function(e, delta) {
+    var opts = {};
+    if (bin) {
+      opts.bin = req.params.bin
     }
 
     delta.fetch(opts, function(e, trends) {
@@ -80,11 +112,14 @@ var server = restify.createServer();
 server.use(restify.queryParser());
 server.use(restify.gzipResponse());
 
-server.get('/create/:category', onCreate);
-server.get('/incr/:category/:bin/:by', onIncrement);
-server.get('/fetch/:category/:bin', onFetch);
-server.get('/fetch/:category', onFetch);
+server.get('/create', onCreate);
+server.get('/create/', onCreate);
 
+server.get('/incr', onIncrement);
+server.get('/incr/', onIncrement);
+
+server.get('/fetch', onFetch);
+server.get('/fetch/', onFetch);
 
 /**
  * Spawns on or more worker nodes
@@ -170,7 +205,7 @@ if (cluster.isMaster && env.DEBUG !== "1") {
       process.exit();
   });
 } else {
-  server.listen(80, function() {
+  server.listen(3000, function() {
     console.log('%s listening at %s', server.name, server.url);
   });
 }
