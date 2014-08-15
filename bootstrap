@@ -1,0 +1,185 @@
+#!/bin/sh -ex
+
+RETVAL=0
+NODE=/usr/bin/node
+NODE_ENV=${NODE_ENV}
+
+export APP_PATH=$( cd $(dirname $0) && pwd )
+export APP_NAME="forgetsy-js-api"
+export APP_PID_DIR="/var/run/${APP_NAME}"
+export APP_PID_FILE="${APP_PID_DIR}/master.pid"
+export APP_LOG_DIR="/var/log/${APP_NAME}"
+export APP_LOG_FILE="${APP_LOG_DIR}/${APP_NAME}.log"
+export APP_BOOTSTRAP="${APP_PATH}/bootstrap"
+export APP_SERVER="${APP_PATH}/index.js"
+export APP_LIB_DIR="${APP_PATH}/lib"
+
+function locathost {
+	echo "Localhost"
+}
+
+function development {
+	echo "Development"
+}
+
+function staging {
+	echo "Staging"
+}
+
+function production {
+	echo "Production"
+}
+
+# create pid dir if it doesn't exists
+function create_pid_dir {
+  if [ ! -d ${APP_PID_DIR} ]; then
+    echo "Making ${APP_PID_DIR}..."
+    mkdir -p ${APP_PID_DIR}
+    RETVAL=$?
+    if [ ! -d ${APP_PID_DIR} ]; then
+      fatal_error "Unable to create directory: ${APP_PID_DIR}..."
+    fi
+  else
+    echo "PID dir already exists: ${APP_PID_DIR}..."
+  fi
+}
+
+# create log dir if it doesn't exists
+function create_log_dir {
+  if [ ! -d ${APP_LOG_DIR} ]; then
+	  echo "Making ${APP_LOG_DIR}..."
+	  mkdir -p ${APP_LOG_DIR}
+	  RETVAL=$?
+	  if [ ! -d ${APP_LOG_DIR} ]; then
+	     fatal_error "Unable to create directory: ${APP_LOG_DIR}..."
+	  fi
+  else
+    echo "Log dir already exists: ${APP_LOG_DIR}..."
+  fi
+}
+
+function check_env {
+  if [ "${ENVIRONMENT}" == "localhost" ]; then
+    localhost
+  elif [ "${ENVIRONMENT}" == "development" ]; then
+    development
+  elif [ "${ENVIRONMENT}" == "staging" ]; then
+    staging
+  else
+    production
+  fi
+}
+
+# run some basic processes/checks
+create_pid_dir
+create_log_dir
+check_env
+
+function kill_process {
+  if [ ! -z ${1} ]; then
+    if kill -2 ${1}; then
+      echo "Process was successfully killed!..."
+      RETVAL=$?
+    else
+      echo "Process was not killed..."
+      RETVAL=0
+    fi
+  fi
+}
+
+# Fire up a new process
+function start {
+  if [ -f "${APP_PID}" ]; then
+    echo "The application is already running"
+  elif [ "${ENVIRONMENT}" == "localhost" ]; then
+    echo "${NODE} ${APP_SERVER} ${APP_LIB_DIR}"
+    supervisor -w "${APP_SERVER}","${APP_LIB_DIR}" -e js,node -x ${NODE} -n error -- ${APP_SERVER} & 
+    SUPER_PID=$!
+    echo ${SUPER_PID} > ${APP_PID}
+    echo "tail -f ${APP_LOG_FILE} to monitor the logs"
+    RETVAL=$?
+
+  else
+    echo "${APP_SERVER}"
+    ${NODE} ${APP_SERVER} 1>>${APP_LOG_FILE} 2>&1 &
+    SUPER_PID=$!
+    echo ${SUPER_PID} > ${APP_PID_FILE}
+    RETVAL=$?
+  fi
+}
+
+# Fire up a new process
+
+function debug {
+  if [ "${ENVIRONMENT}" == "localhost" ]; then
+    echo "${NODE} debug ${APP_SERVER}"
+    export DEBUG="1"
+
+    ${NODE} debug ${APP_PATH}/server.js
+
+    echo "tail -f ${APP_LOG_FILE} to monitor the logs"
+
+    RETVAL=$?
+  fi
+}
+
+# Kills any currently running process(es)
+function stop {
+  echo "stopping the application..."
+
+  if [ -f "${APP_PID_FILE}" ]; then
+    PID=$(cat ${APP_PID_FILE} | grep --only-matching -m 1 '^[0-9]*')
+
+    if [ "${ENVIRONMENT}" == "localhost" ]; then
+      if [ -f "${APP_PID_SUPERVISOR}" ]; then
+        SUPERVISOR_PID=$(cat ${APP_PID_SUPERVISOR} | grep --only-matching -m 1 '^[0-9]*')
+        if [ ! -z ${SUPERVISOR_PID} ]; then
+          echo ">>>>>>> KILLING PID OF SUPERVISOR"
+          kill_process ${SUPERVISOR_PID}
+        fi
+      fi
+    fi
+
+    kill_process ${PID}
+
+    if rm -f "${APP_PID_FILE}"; then
+      echo "Removed PID ${APP_PID}"
+      RETVAL=$?
+    else 
+      echo "Unable to remove PID ${APP_PID_FILE}"
+      RETVAL=0
+    fi
+  fi
+}
+
+function restart {
+  stop
+  start
+}
+
+function help {
+  echo "usage: ${APP_BOOTSTRAP} {start|stop|restart}"
+  RETVAL=1
+}
+
+case $1 in
+    start )   start
+    ;;
+
+    stop )    stop
+    ;;
+
+    restart )   restart
+    ;;
+
+    debug )   debug
+    ;;
+
+    port)   PORT=$1
+    ;;
+
+    * )   help    
+    ;;
+esac
+
+exit $RETVAL

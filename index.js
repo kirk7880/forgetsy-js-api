@@ -19,6 +19,17 @@ var moment = require('moment');
 
 env.APP_PID = path.resolve(__dirname + '/master.pid');
 
+function create(category, time, cb) {
+  Delta.create({
+    name: category
+    ,time: time
+  }, cb);
+}
+
+function normalizeName(name) {
+  return name.replace(/\W+/g, "").replace(/\s/g, "_");
+}
+
 function onCreate(req, res, next) {
   var qs = req.query;
   var category = qs.category;
@@ -27,12 +38,10 @@ function onCreate(req, res, next) {
   var count = 0;
 
   for (var i=0; i<len; i++) {
-    console.log('creating', category, time[keys[i]]);
     Delta.create({
       name: keys[i] + '_' + category
       ,time: time[keys[i]]()
     }, function(e) {
-      console.log('count', count)
       if (++count >= len) {
         res.send('Entry was created!');
       }
@@ -48,7 +57,6 @@ var increment = function(category, bin, incrementBy, cb) {
       bin: bin
       ,by: incrementBy
     }, function(e) {
-      console.log('incr', e);
       if (e) return cb(e);
 
       return cb(null);
@@ -56,39 +64,57 @@ var increment = function(category, bin, incrementBy, cb) {
   })
 };
 
+/**
+- Iterate the collection of category names
+- Normalize the name by stripping non-alpha chars
+  and replacing spaces with underscores
+- Append the type to the categor name
+- Increment the bin in each distribtion created
+*/
 function onIncrement(req, res, next) {
   var qs = req.query;
-  var category = qs.category;
+  if (!qs.categories) return res.send(400, 'Missing one or more categories!');
+  if (!qs.type) return res.send(400, 'Missing the category type!');
+  if (!qs.bin) return res.send(400, 'Missing bin to increment!');
+
+  var categories = qs.categories.split(',');
+  var type = qs.type;
   var bin = qs.bin;
-  var keys = Object.keys(time);
-  var len = keys.length;
-  var count = 0;
   var incrementBy = parseInt(qs.by, 10);
   incrementBy = (incrementBy > 0) ? incrementBy : 1;
 
+  var len = categories.length;
+  var count = 0;
+
   for (var i=0; i<len; i++) {
-    var c = keys[i] + '_' + category;
-    increment(c, bin, incrementBy, function(e) {
-      if (++count >= len) {
-        res.send('Incremented bin');
-      }
+    var category = normalizeName(categories[i]);
+    category = type + '_' + category;
+
+    if (!category) continue;
+    create(category, time.week(), function(e, delta) {
+      if (delta) {
+        delta.incr({
+          bin: bin
+          ,by: incrementBy
+        }, function(e) {})
+      } 
     });
   }
+
+  res.send(200);
 }
 
 function onFetch(req, res, next) {
   var qs = req.query;
+  if (!qs.category) return res.send(400, 'Missing one or more categories!');
+  if (!qs.type) return res.send(400, 'Missing the category type!');
+
   var category = qs.category;
+  var type = qs.type;
   var bin = qs.bin;
   var filter;
 
-  if (qs.filter && time[qs.filter]) {
-    filter = qs.filter;
-  } else {
-    filter = 'week';
-  }
-
-  category = filter + '_' + category;
+  category = type + '_' + normalizeName(category);
 
   Delta.get(category, function(e, delta) {
     var opts = {};
@@ -167,17 +193,7 @@ var stopWorkers = function() {
   });
 };
 
-/**
- * Generates the pid file for the master process
- * @param null
- * @return void
- */
-var writePID = function() {
-  fs.writeFileSync(env.APP_PID,  process.pid.toString(), 'ascii');
-};
-
 if (cluster.isMaster && env.DEBUG !== "1") {
-  writePID();
   spawn();
   cluster.on('exit', function(worker, code, sig) {
     logger.error('Cluster worker existed. Forking a new one...');
