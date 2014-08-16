@@ -4,7 +4,7 @@ module.exports = function(grunt) {
     jshint: {
       all: {
         src: [
-          'cherry-api.js'
+          'index.js'
         ]
       },
       options: {
@@ -40,7 +40,7 @@ module.exports = function(grunt) {
       rpm: {
         build: {
           installPrefix: '',
-          pre: 'rm -rf /var/nyt/cherry-api',
+          pre: 'rm -r /opt/<%= pkg.name %>',
           files: [
             './controller',
             './node_modules/express',
