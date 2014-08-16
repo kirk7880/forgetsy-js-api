@@ -7,9 +7,9 @@ The basic idea is the notion of a category and at type. Let's say, for example, 
 You may have videos and articles which is in the category "food." To trend both the articles and the videos separately, we would make a request to the API recording the impression as follows:
 
 Video:
-- ?category=food&type=video&bin=<video_id>
+- ?category=food&type=video&bin=video_id
 
 Article:
-- ?category=food&type=article&bin=<article_id>
+- ?category=food&type=article&bin=article_id
 
 
