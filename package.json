@@ -10,15 +10,16 @@
   "dependencies": {
     "forgetsy-js": "git://github.com/kirk7880/forgetsy-js.git",
     "express": "*",
-    "connect": "2.7.3",
+    "connect": "*",
     "express-validator": "*",
     "body-parser": "*",
     "method-override": "*",
     "express-session": "*",
     "cookie-parser": "*",
     "csurf": "*",
-    "cors": "2.3.1",
-    "moment": "*"
+    "cors": "*",
+    "moment": "*",
+    "geoip-lite": "*"
   },
   "devDependencies": {
     "grunt-buster": "*",

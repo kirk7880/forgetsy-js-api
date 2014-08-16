@@ -25,7 +25,8 @@ var moment = require('moment');
 
 // set the logger in the module
 app.logger = logger;
-app.use(bodyParser()) 
+app.enable('trust proxy');
+app.use(bodyParser());
 app.use(connect.logger());
 app.use(connect.urlencoded());
 app.use(connect.json()); 

@@ -6,6 +6,20 @@
         "url": ""
     },
     "files": {
+        "lib/incr.js": {
+            "name": "lib/incr.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "lib/utils.js": {
+            "name": "lib/utils.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
         "index.js": {
             "name": "index.js",
             "modules": {},
@@ -18,14 +32,8 @@
     "classes": {},
     "classitems": [
         {
-            "file": "index.js",
-            "line": 1,
-            "description": "This is not production ready stuff!!!\nPrototyping",
-            "class": ""
-        },
-        {
-            "file": "index.js",
-            "line": 66,
+            "file": "lib/incr.js",
+            "line": 5,
             "description": "- Iterate the collection of category names\n- Normalize the name by stripping non-alpha chars\n  and replacing spaces with underscores\n- Append the type to the categor name\n- Increment the bin in each distribtion created",
             "params": [
                 {
@@ -48,8 +56,127 @@
             "class": ""
         },
         {
+            "file": "lib/utils.js",
+            "line": 9,
+            "description": "Normalizes the category name by removing\nnon-alphanumerical characters and\nreplacing \\s [spaces] with underscores.",
+            "params": [
+                {
+                    "name": "name",
+                    "description": "Category name",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "the normalized name",
+                "type": "String"
+            },
+            "class": ""
+        },
+        {
+            "file": "lib/utils.js",
+            "line": 20,
+            "description": "Formats the category distribution name\nby concatenating the type & the category\nusing an underscore. The type and name\nstrings are first normalized before \njoining.",
+            "params": [
+                {
+                    "name": "type",
+                    "description": "Type of distribution",
+                    "type": "String"
+                },
+                {
+                    "name": "name",
+                    "description": "Name of distribution",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": ""
+        },
+        {
+            "file": "lib/utils.js",
+            "line": 34,
+            "description": "Creates a new categorial distribution",
+            "params": [
+                {
+                    "name": "category",
+                    "description": "Name of distribution",
+                    "type": "String"
+                },
+                {
+                    "name": "time",
+                    "description": "The window of time to trend",
+                    "type": "Number"
+                },
+                {
+                    "name": "cb",
+                    "description": "The function to invoke after\n\tprocessing completes",
+                    "type": "Function"
+                }
+            ],
+            "return": {
+                "description": "void"
+            },
+            "class": ""
+        },
+        {
+            "file": "lib/utils.js",
+            "line": 49,
+            "description": "Increments a specific bin by n.",
+            "params": [
+                {
+                    "name": "category",
+                    "description": "Name of category\n\tthe bin belongs to (ie: food)",
+                    "type": "String"
+                },
+                {
+                    "name": "bin",
+                    "description": "The bin to increment (ie: <item id>)",
+                    "type": "Mixed"
+                },
+                {
+                    "name": "incrementBy",
+                    "description": "The value to increment the bin by",
+                    "type": "Number"
+                },
+                {
+                    "name": "cb",
+                    "description": "The function to invoke after processing",
+                    "type": "Function"
+                }
+            ],
+            "return": {
+                "description": "void"
+            },
+            "class": ""
+        },
+        {
+            "file": "lib/utils.js",
+            "line": 84,
+            "description": "Determines the users' location\nand create a distribtion for\nthat country, region and \ncity.",
+            "params": [
+                {
+                    "name": "req",
+                    "description": "The request object",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Array"
+            },
+            "class": ""
+        },
+        {
             "file": "index.js",
-            "line": 153,
+            "line": 1,
+            "description": "This is not production ready stuff!!!\nPrototyping",
+            "class": ""
+        },
+        {
+            "file": "index.js",
+            "line": 46,
             "description": "Spawns on or more worker nodes",
             "params": [
                 {
@@ -64,7 +191,7 @@
         },
         {
             "file": "index.js",
-            "line": 170,
+            "line": 63,
             "description": "Removes a worker from the pool of workers",
             "params": [
                 {
@@ -80,7 +207,7 @@
         },
         {
             "file": "index.js",
-            "line": 187,
+            "line": 80,
             "description": "Stops the worker processes",
             "params": [
                 {
@@ -97,27 +224,47 @@
     "warnings": [
         {
             "message": "unknown tag: retur",
-            "line": " index.js:66"
+            "line": " lib/incr.js:5"
+        },
+        {
+            "message": "Missing item type\n- Iterate the collection of category names\n- Normalize the name by stripping non-alpha chars\n  and replacing spaces with underscores\n- Append the type to the categor name\n- Increment the bin in each distribtion created",
+            "line": " lib/incr.js:5"
+        },
+        {
+            "message": "Missing item type\nNormalizes the category name by removing\nnon-alphanumerical characters and\nreplacing \\s [spaces] with underscores.",
+            "line": " lib/utils.js:9"
+        },
+        {
+            "message": "Missing item type\nFormats the category distribution name\nby concatenating the type & the category\nusing an underscore. The type and name\nstrings are first normalized before \njoining.",
+            "line": " lib/utils.js:20"
+        },
+        {
+            "message": "Missing item type\nCreates a new categorial distribution",
+            "line": " lib/utils.js:34"
+        },
+        {
+            "message": "Missing item type\nIncrements a specific bin by n.",
+            "line": " lib/utils.js:49"
+        },
+        {
+            "message": "Missing item type\nDetermines the users' location\nand create a distribtion for\nthat country, region and \ncity.",
+            "line": " lib/utils.js:84"
         },
         {
             "message": "Missing item type\nThis is not production ready stuff!!!\nPrototyping",
             "line": " index.js:1"
         },
         {
-            "message": "Missing item type\n- Iterate the collection of category names\n- Normalize the name by stripping non-alpha chars\n  and replacing spaces with underscores\n- Append the type to the categor name\n- Increment the bin in each distribtion created",
-            "line": " index.js:66"
-        },
-        {
             "message": "Missing item type\nSpawns on or more worker nodes",
-            "line": " index.js:153"
+            "line": " index.js:46"
         },
         {
             "message": "Missing item type\nRemoves a worker from the pool of workers",
-            "line": " index.js:170"
+            "line": " index.js:63"
         },
         {
             "message": "Missing item type\nStops the worker processes",
-            "line": " index.js:187"
+            "line": " index.js:80"
         }
     ]
 }

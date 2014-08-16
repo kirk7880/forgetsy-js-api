@@ -89,12 +89,19 @@ This is not production ready stuff!!!
 Prototyping
 */
 var env = process.env;
-var restify = require(&#x27;express&#x27;);
+var connect = require(&#x27;connect&#x27;);
+var validator = require(&#x27;express-validator&#x27;);
+var bodyParser = require(&#x27;body-parser&#x27;);
+var methodOverride = require(&#x27;method-override&#x27;);
+var esession = require(&#x27;express-session&#x27;);
+var cookieParser = require(&#x27;cookie-parser&#x27;);
+var csrf = require(&#x27;csurf&#x27;);
+var cors = require(&#x27;cors&#x27;);
+var path = require(&#x27;path&#x27;);
+var express = require(&#x27;express&#x27;);
+var app  = express();
 var fs = require(&#x27;fs&#x27;);
 var path = require(&#x27;path&#x27;);
-var forgetsy = require(&#x27;forgetsy-js&#x27;);
-var Delta = forgetsy.Delta;
-var time = require(__dirname + &#x27;/lib/time&#x27;);
 var cluster = require(&#x27;cluster&#x27;);
 var cpus = require(&#x27;os&#x27;).cpus().length;
 var workers = [];
@@ -102,139 +109,25 @@ var sigint = false;
 var logger = console;
 var moment = require(&#x27;moment&#x27;);
 
-env.APP_PID = path.resolve(__dirname + &#x27;/master.pid&#x27;);
+// set the logger in the module
+app.logger = logger;
+app.enable(&#x27;trust proxy&#x27;);
+app.use(bodyParser());
+app.use(connect.logger());
+app.use(connect.urlencoded());
+app.use(connect.json()); 
+app.use(methodOverride(&#x27;X-HTTP-Method-Override&#x27;));
+app.use(cookieParser());
+app.use(esession({secret: env.APP_SESSION_SECRET}));
+app.use(csrf());
+app.use(connect.compress());
+app.use(validator());
+app.use(cors());
 
-function create(category, time, cb) {
-  Delta.create({
-    name: category
-    ,time: time
-  }, cb);
-}
-
-function normalizeName(name) {
-  return name.replace(/\W+/g, &quot;&quot;).replace(/\s/g, &quot;_&quot;);
-}
-
-function onCreate(req, res, next) {
-  var qs = req.query;
-  var category = qs.category;
-  var keys = Object.keys(time);
-  var len = keys.length;
-  var count = 0;
-
-  for (var i=0; i&lt;len; i++) {
-    Delta.create({
-      name: keys[i] + &#x27;_&#x27; + category
-      ,time: time[keys[i]]()
-    }, function(e) {
-      if (++count &gt;= len) {
-        res.send(&#x27;Entry was created!&#x27;);
-      }
-    });
-  }
-}
-
-var increment = function(category, bin, incrementBy, cb) {
-  Delta.get(category, function(e, delta) {
-    if (e) return cb(e);
-
-    delta.incr({
-      bin: bin
-      ,by: incrementBy
-    }, function(e) {
-      if (e) return cb(e);
-
-      return cb(null);
-    });
-  })
-};
-
-/**
-- Iterate the collection of category names
-- Normalize the name by stripping non-alpha chars
-  and replacing spaces with underscores
-- Append the type to the categor name
-- Increment the bin in each distribtion created
-@param {Object} req Request object
-@param {Object} res Response Object
-@param {Function} next Function to invoke next
-@retur void
-*/
-function onIncrement(req, res, next) {
-  var qs = req.query;
-  if (!qs.categories) return res.send(400, &#x27;Missing one or more categories!&#x27;);
-  if (!qs.type) return res.send(400, &#x27;Missing the category type!&#x27;);
-  if (!qs.bin) return res.send(400, &#x27;Missing bin to increment!&#x27;);
-
-  var categories = qs.categories.split(&#x27;,&#x27;);
-  var type = qs.type;
-  var bin = qs.bin;
-  var incrementBy = parseInt(qs.by, 10);
-  incrementBy = (incrementBy &gt; 0) ? incrementBy : 1;
-
-  var len = categories.length;
-  var count = 0;
-
-  for (var i=0; i&lt;len; i++) {
-    var category = normalizeName(categories[i]);
-    category = type + &#x27;_&#x27; + category;
-
-    if (!category) continue;
-    create(category, time.week(), function(e, delta) {
-      if (delta) {
-        delta.incr({
-          bin: bin
-          ,by: incrementBy
-        }, function(e) {})
-      } 
-    });
-  }
-
-  res.send(200);
-}
-
-function onFetch(req, res, next) {
-  var qs = req.query;
-  if (!qs.category) return res.send(400, &#x27;Missing one or more categories!&#x27;);
-  if (!qs.type) return res.send(400, &#x27;Missing the category type!&#x27;);
-
-  var category = qs.category;
-  var type = qs.type;
-  var bin = qs.bin;
-  var filter;
-
-  category = type + &#x27;_&#x27; + normalizeName(category);
-
-  Delta.get(category, function(e, delta) {
-    var opts = {};
-    if (bin) {
-      opts.bin = req.params.bin
-    }
-
-    delta.fetch(opts, function(e, trends) {
-      if (e) {
-        res.send(&#x27;Error fetching bin: &#x27; + req.params.bin);
-      } else {
-        res.send(JSON.stringify(trends));
-
-        next();
-      }
-    });
-  });
-}
-
-var server = restify.createServer();
-server.use(restify.queryParser());
-server.use(restify.gzipResponse());
-
-server.get(&#x27;/create&#x27;, onCreate);
-server.get(&#x27;/create/&#x27;, onCreate);
-
-server.get(&#x27;/incr&#x27;, onIncrement);
-server.get(&#x27;/incr/&#x27;, onIncrement);
-
-server.get(&#x27;/fetch&#x27;, onFetch);
-server.get(&#x27;/fetch/&#x27;, onFetch);
+// routers
+require(__dirname + &#x27;/lib/incr&#x27;)(app);
+require(__dirname + &#x27;/lib/create&#x27;)(app);
+require(__dirname + &#x27;/lib/fetch&#x27;)(app);
 
 /**
  * Spawns on or more worker nodes
@@ -305,13 +198,13 @@ if (cluster.isMaster &amp;&amp; env.DEBUG !== &quot;1&quot;) {
   });
 
   process.on(&#x27;SIGINT&#x27;,function(){
-      logger.warn(&#x27;SIGINT issued! Terminating server...&#x27;);
+      logger.warn(&#x27;SIGINT issued! Terminating app...&#x27;);
       sigint = true;
       process.exit();
   });
 } else {
-  server.listen(3000, function() {
-    console.log(&#x27;%s listening at %s&#x27;, server.name, server.url);
+  app.listen(3000, function() {
+    console.log(&#x27;%s listening at %s&#x27;, app.name, app.url);
   });
 }
 

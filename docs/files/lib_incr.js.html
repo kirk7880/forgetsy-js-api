@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>lib/incr.js - forgetsy-js-api</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="shortcut icon" type="image/png" href="../assets/favicon.png">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+            
+                <h1><img src="../assets/css/logo.png" title="forgetsy-js-api"></h1>
+            
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 0.0.0</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+    <h2 class="off-left">APIs</h2>
+    <div id="api-tabview" class="tabview">
+        <ul class="tabs">
+            <li><a href="#api-classes">Classes</a></li>
+            <li><a href="#api-modules">Modules</a></li>
+        </ul>
+
+        <div id="api-tabview-filter">
+            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+        </div>
+
+        <div id="api-tabview-panel">
+            <ul id="api-classes" class="apis classes">
+            
+            </ul>
+
+            <ul id="api-modules" class="apis modules">
+            
+            </ul>
+        </div>
+    </div>
+</div>
+
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+        Show:
+        <label for="api-show-inherited">
+            <input type="checkbox" id="api-show-inherited" checked>
+            Inherited
+        </label>
+
+        <label for="api-show-protected">
+            <input type="checkbox" id="api-show-protected">
+            Protected
+        </label>
+
+        <label for="api-show-private">
+            <input type="checkbox" id="api-show-private">
+            Private
+        </label>
+        <label for="api-show-deprecated">
+            <input type="checkbox" id="api-show-deprecated">
+            Deprecated
+        </label>
+
+    </div>
+
+
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+                        <h1 class="file-heading">File: lib/incr.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+&#x27;use strict&#x27;;
+
+var utils = require(__dirname + &#x27;/utils&#x27;);
+
+/**
+- Iterate the collection of category names
+- Normalize the name by stripping non-alpha chars
+  and replacing spaces with underscores
+- Append the type to the categor name
+- Increment the bin in each distribtion created
+@param {Object} req Request object
+@param {Object} res Response Object
+@param {Function} next Function to invoke next
+@retur void
+*/
+function onIncr(req, res, next) {
+  var qs = req.query;
+  if (!qs.categories) return res.send(400, &#x27;Missing one or more categories!&#x27;);
+  if (!qs.type) return res.send(400, &#x27;Missing the category type!&#x27;);
+  if (!qs.bin) return res.send(400, &#x27;Missing bin to increment!&#x27;);
+
+  var geoip = utils.geoip(req);
+  var categories = qs.categories.split(&#x27;,&#x27;);
+  categories = categories.concat(geoip);
+  var type = qs.type;
+  var bin = qs.bin;
+  var incrementBy = parseInt(qs.by, 10);
+  incrementBy = (incrementBy &gt; 0) ? incrementBy : 1;
+  var len = categories.length;
+  var count = 0;
+
+  for (var i=0; i&lt;len; i++) {
+    var category = categories[i];
+    if (!category) continue;
+
+    category = utils.formatName(type, category);
+
+    console.log(&#x27;category&#x27;, category);
+
+    utils.create(category, utils.time.week(), function(e, delta) {
+      if (delta) {
+        delta.incr({
+          bin: bin
+          ,by: incrementBy
+        }, function(e) {})
+      } 
+    });
+  }
+
+  res.send(200);
+}
+
+module.exports = function(app) {
+  app.get(&#x27;/incr&#x27;, onIncr);
+  app.get(&#x27;/incr/&#x27;, onIncr);
+};
+    </pre>
+</div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>
