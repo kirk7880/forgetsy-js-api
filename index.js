@@ -39,9 +39,9 @@ app.use(validator());
 app.use(cors());
 
 // routers
-require(__dirname + '/lib/incr')(app);
-require(__dirname + '/lib/create')(app);
-require(__dirname + '/lib/fetch')(app);
+require(env.APP_LIB_DIR + '/incr')(app);
+require(env.APP_LIB_DIR + '/create')(app);
+require(env.APP_LIB_DIR + '/fetch')(app);
 
 /**
  * Spawns on or more worker nodes
