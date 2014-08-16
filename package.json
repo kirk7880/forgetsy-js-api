@@ -9,10 +9,22 @@
   },
   "dependencies": {
     "forgetsy-js": "git://github.com/kirk7880/forgetsy-js.git",
-    "restify": "*",
+    "express": "*",
+    "connect": "2.7.3",
+    "express-validator": "*",
+    "body-parser": "*",
+    "method-override": "*",
+    "express-session": "*",
+    "cookie-parser": "*",
+    "csurf": "*",
+    "cors": "2.3.1",
     "moment": "*"
   },
   "devDependencies": {
+    "grunt-buster": "*",
+    "grunt-contrib-jshint": "*",
+    "grunt-contrib-yuidoc": "*",
+    "grunt-rpm": "*"
   },
   "author": "",
   "license": "ISC"

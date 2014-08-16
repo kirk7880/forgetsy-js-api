@@ -1,0 +1,123 @@
+{
+    "project": {
+        "name": "forgetsy-js-api",
+        "description": "API implementation using forgetsy-js library",
+        "version": "0.0.0",
+        "url": ""
+    },
+    "files": {
+        "index.js": {
+            "name": "index.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        }
+    },
+    "modules": {},
+    "classes": {},
+    "classitems": [
+        {
+            "file": "index.js",
+            "line": 1,
+            "description": "This is not production ready stuff!!!\nPrototyping",
+            "class": ""
+        },
+        {
+            "file": "index.js",
+            "line": 66,
+            "description": "- Iterate the collection of category names\n- Normalize the name by stripping non-alpha chars\n  and replacing spaces with underscores\n- Append the type to the categor name\n- Increment the bin in each distribtion created",
+            "params": [
+                {
+                    "name": "req",
+                    "description": "Request object",
+                    "type": "Object"
+                },
+                {
+                    "name": "res",
+                    "description": "Response Object",
+                    "type": "Object"
+                },
+                {
+                    "name": "next",
+                    "description": "Function to invoke next",
+                    "type": "Function"
+                }
+            ],
+            "retur": "void",
+            "class": ""
+        },
+        {
+            "file": "index.js",
+            "line": 153,
+            "description": "Spawns on or more worker nodes",
+            "params": [
+                {
+                    "name": "null",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "void"
+            },
+            "class": ""
+        },
+        {
+            "file": "index.js",
+            "line": 170,
+            "description": "Removes a worker from the pool of workers",
+            "params": [
+                {
+                    "name": "Worker",
+                    "description": "object to remove",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "void"
+            },
+            "class": ""
+        },
+        {
+            "file": "index.js",
+            "line": 187,
+            "description": "Stops the worker processes",
+            "params": [
+                {
+                    "name": "null",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "void"
+            },
+            "class": ""
+        }
+    ],
+    "warnings": [
+        {
+            "message": "unknown tag: retur",
+            "line": " index.js:66"
+        },
+        {
+            "message": "Missing item type\nThis is not production ready stuff!!!\nPrototyping",
+            "line": " index.js:1"
+        },
+        {
+            "message": "Missing item type\n- Iterate the collection of category names\n- Normalize the name by stripping non-alpha chars\n  and replacing spaces with underscores\n- Append the type to the categor name\n- Increment the bin in each distribtion created",
+            "line": " index.js:66"
+        },
+        {
+            "message": "Missing item type\nSpawns on or more worker nodes",
+            "line": " index.js:153"
+        },
+        {
+            "message": "Missing item type\nRemoves a worker from the pool of workers",
+            "line": " index.js:170"
+        },
+        {
+            "message": "Missing item type\nStops the worker processes",
+            "line": " index.js:187"
+        }
+    ]
+}

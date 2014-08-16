@@ -13,6 +13,7 @@ export APP_LOG_FILE="${APP_LOG_DIR}/${APP_NAME}.log"
 export APP_BOOTSTRAP="${APP_PATH}/bootstrap"
 export APP_SERVER="${APP_PATH}/index.js"
 export APP_LIB_DIR="${APP_PATH}/lib"
+export APP_SESSION_SECRET="thisis mysecret keyyzz"
 
 function locathost {
 	echo "Localhost"
