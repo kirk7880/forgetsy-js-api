@@ -56,10 +56,4 @@ The beginning of a trending API using [forgetsy-js](https://github.com/kirk7880/
 	</tr>
 </table>
 
-Video:
-- /incr/?category=food&type=video&bin=video_id
-
-Article:
-- /incr/?category=food&type=article&bin=article_id
-
 
