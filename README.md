@@ -7,18 +7,22 @@ The beginning of a trending API using [forgetsy-js](https://github.com/kirk7880/
 
 <table>
 	<tr>
+		<td><b>Action</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
 		<td>Create</td>
-		<td></td>
+		<td>Creates a new distribtion</td>
 	</tr>
 
 	<tr>
 		<td>Increment</td>
-		<td></td>
+		<td>Increments a bin</td>
 	</tr>
 
 	<tr>
 		<td>Fetch</td>
-		<td></td>
+		<td>Fetches a distribution or specific bin in a distribtion</td>
 	</tr>
 </table>
 
