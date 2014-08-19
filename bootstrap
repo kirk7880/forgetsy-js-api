@@ -103,7 +103,7 @@ function start {
 
   else
     echo "${APP_SERVER}"
-    ${NODE} --trace-deopt --trace-opt ${APP_SERVER} 1>>${APP_LOG_FILE} 2>&1 &
+    ${NODE} ${APP_SERVER} 1>>${APP_LOG_FILE} 2>&1 &
     SUPER_PID=$!
     echo ${SUPER_PID} > ${APP_PID_FILE}
     RETVAL=$?
