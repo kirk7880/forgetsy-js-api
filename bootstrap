@@ -14,7 +14,27 @@ export APP_BOOTSTRAP="${APP_PATH}/bootstrap"
 export APP_SERVER="${APP_PATH}/index.js"
 export APP_LIB_DIR="${APP_PATH}/lib"
 export APP_SESSION_SECRET="thisis mysecret keyyzz"
+export APP_PORT=80
 
+# locate node program
+if ! command -v ${NODE}; then
+  echo "Unable to find node... using default ${DEFAULT_NODE_PROGRAM}..."
+  NODE=/usr/local/bin/node
+
+  if [ ! -x ${NODE} ]; then
+    echo "Node was not located... Trying to locate node"
+    NODE=$(which node)
+    if [ -x ${NODE} ]; then
+      echo "Found node at ${NODE}"
+    else
+      fatal_error "Error: Node was not located"
+    fi
+  else
+    echo "Found node: ${NODE}..."
+  fi
+else
+  echo "Found node: ${NODE}..."
+fi
 
 function locathost {
 	echo "Localhost"
