@@ -117,7 +117,7 @@ if (cluster.isMaster && env.DEBUG !== "1") {
       process.exit();
   });
 } else {
-  app.listen(3000, function() {
+  app.listen(env.APP_PORT, function() {
     console.log('%s listening at %s', app.name, app.url);
   });
 }
