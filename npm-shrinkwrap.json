@@ -399,29 +399,25 @@
       }
     },
     "forgetsy-js": {
-      "version": "0.6.7",
+      "version": "0.8.0",
       "from": "forgetsy-js@git://github.com/kirk7880/forgetsy-js.git",
-      "resolved": "git://github.com/kirk7880/forgetsy-js.git#707e428ca3a8b3af915f5e327f2ae006fce7d74b",
+      "resolved": "git://github.com/kirk7880/forgetsy-js.git#7e465508ffb0c120d6fe7ba5cf1922ef5eae755b",
       "dependencies": {
         "redis": {
-          "version": "0.11.0",
-          "from": "redis@*",
-          "resolved": "http://registry.npmjs.org/redis/-/redis-0.11.0.tgz"
+          "version": "0.12.1",
+          "from": "redis@*"
         },
         "hiredis": {
           "version": "0.1.17",
           "from": "hiredis@*",
-          "resolved": "http://registry.npmjs.org/hiredis/-/hiredis-0.1.17.tgz",
           "dependencies": {
             "bindings": {
               "version": "1.2.1",
-              "from": "bindings@*",
-              "resolved": "http://registry.npmjs.org/bindings/-/bindings-1.2.1.tgz"
+              "from": "bindings@*"
             },
             "nan": {
               "version": "1.1.2",
-              "from": "nan@~1.1.0",
-              "resolved": "http://registry.npmjs.org/nan/-/nan-1.1.2.tgz"
+              "from": "nan@~1.1.0"
             }
           }
         }

@@ -14,7 +14,7 @@ export APP_BOOTSTRAP="${APP_PATH}/bootstrap"
 export APP_SERVER="${APP_PATH}/index.js"
 export APP_LIB_DIR="${APP_PATH}/lib"
 export APP_SESSION_SECRET="thisis mysecret keyyzz"
-export APP_PORT=80
+export APP_PORT=3000
 
 # locate node program
 if ! command -v ${NODE}; then
