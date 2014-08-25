@@ -19,7 +19,8 @@
     "csurf": "*",
     "cors": "*",
     "moment": "*",
-    "geoip-lite": "*"
+    "geoip-lite": "*",
+    "es6-promise": "*"
   },
   "devDependencies": {
     "grunt-buster": "*",
