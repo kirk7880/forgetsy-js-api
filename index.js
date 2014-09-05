@@ -42,6 +42,7 @@ app.use(cors());
 require(env.APP_LIB_DIR + '/incr')(app);
 require(env.APP_LIB_DIR + '/create')(app);
 require(env.APP_LIB_DIR + '/fetch')(app);
+require(env.APP_LIB_DIR + '/status')(app);
 
 /**
  * Spawns on or more worker nodes
